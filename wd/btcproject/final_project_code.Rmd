@@ -1,0 +1,378 @@
+---
+title: "Text-Based Analysis"
+author: "Sung Pil Kim"
+date: "4/5/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = F)
+```
+
+## Connect
+
+```{r packages, message=FALSE, warning=FALSE, results='hide'}
+#Text Analysis
+library(tm)
+
+#Data wrangling
+library(tidyverse)
+library(skimr)
+library(ggplot2)
+library(ggthemes)
+library(ggpubr)
+library(forecast)
+
+#Predictive Model
+library(rpart)
+library(rpart.plot)
+library(glmnet)
+library(xgboost)
+library(Metrics)
+```
+
+## Load Data & Create a Corpus
+
+```{r bitcoindata, message=FALSE}
+## Load Data
+data <- read.csv('news_title_data.csv', stringsAsFactors = FALSE)
+
+## Create a corpus
+corpus <- VCorpus(VectorSource(data$news_title))
+```
+
+## Data Preprocessing
+
+```{r textcleaning}
+## Map text processing function to corpus
+original_corpus <- corpus
+corpus <- tm_map(corpus,FUN = content_transformer(tolower))
+
+## Match pattern and replace url with blank space.
+blankurl <- function(x) gsub(pattern = 'http[[:alnum:][:punct:]]*', replacement = ' ',x = x)
+corpus <- tm_map(corpus, FUN = content_transformer(FUN = blankurl))
+
+## Remove punctuation
+corpus <- tm_map(corpus, FUN = removePunctuation)
+
+## Strip whitespace
+corpus <- tm_map(corpus, FUN = stripWhitespace)
+
+## Remove stopwords
+corpus <- tm_map(corpus,FUN = removeWords,c(stopwords('english'), 'cryptocurrency', 'crypto', 'cryptocurrencies', 'cryptocurr', 'bitcoin'))
+
+## Create a dictionary, then stem
+dtm <- DocumentTermMatrix(original_corpus)
+dict <- findFreqTerms(dtm, lowfreq = 0)
+
+## New corpus with single words
+dict_corpus <- VCorpus(VectorSource(dict))
+
+## Stem documents
+corpus <- tm_map(corpus,FUN = stemDocument)
+
+## Tokenize
+dtm <- DocumentTermMatrix(corpus)
+
+## Inspect dtm
+inspect(dtm)
+
+## Remove spare terms
+xdtm <- removeSparseTerms(dtm,sparse = 0.95)
+dim(xdtm)
+
+### TERM FREQUENCY (TF) ###
+## Complete stems using dictionary
+xdtm <- as.data.frame(as.matrix(xdtm))
+#sort(colSums(xdtm),decreasing = T)
+colnames(xdtm) <- stemCompletion(x = colnames(xdtm),
+                                dictionary = dict_corpus,
+                                type='prevalent')
+colnames(xdtm) <- make.names(colnames(xdtm))
+
+## Sort them by term frequency
+head(sort(colSums(xdtm),decreasing = TRUE))
+
+### TERM FREQUENCY - INVERSE DOCUMENT FREQUENCY (TF-IDF) ###
+dtm_tfidf <- DocumentTermMatrix(x=corpus,
+                               control = list(weighting = function(x) weightTfIdf(x, normalize=FALSE)))
+xdtm_tfidf <- removeSparseTerms(dtm_tfidf,sparse = 0.95)
+xdtm_tfidf <- as.data.frame(as.matrix(xdtm_tfidf))
+colnames(xdtm_tfidf) <- stemCompletion(x = colnames(xdtm_tfidf),
+                                      dictionary = dict_corpus,
+                                      type='prevalent')
+colnames(xdtm_tfidf) <- make.names(colnames(xdtm_tfidf))
+head(sort(colSums(xdtm_tfidf),decreasing = T), 10)
+```
+
+## TF vs. TF-IDF Visualization (Top 20 words)
+
+```{r visualization}
+data.frame(term = colnames(xdtm),tf = colMeans(xdtm), tfidf = colMeans(xdtm_tfidf))%>%
+  arrange(desc(tf))%>%
+  top_n(20)%>%
+  gather(key=weighting_method,value=weight,2:3)%>%
+  ggplot(aes(x=term,y=weight,fill=weighting_method))+
+  geom_col(position='dodge')+
+  coord_flip()+
+  theme_economist()
+```
+
+## Predictive models using TDF vs TF-IDF
+### Model Preparation
+
+```{r predictionprep, message=FALSE}
+# Add abs. value of price percent change back to data
+news_title_data <- cbind(abs_price_pc = data$abs_pc_avg, xdtm)
+news_title_data_tfidf <- cbind(abs_price_pc = data$abs_pc_avg, xdtm_tfidf)
+
+# Split data
+set.seed(617)
+split <- sample(1:nrow(news_title_data),size = 0.7*nrow(news_title_data))
+
+train_tdf <- news_title_data[split,]
+test_tdf <- news_title_data[-split,]
+
+train_tfidf <- news_title_data_tfidf[split,]
+test_tfidf <- news_title_data_tfidf[-split,]
+```
+
+### Lasso
+
+```{r predictions}
+## TDF
+lasso_tdf <- cv.glmnet(as.matrix(train_tdf[,-1]), train_tdf$abs_price_pc, family="gaussian", alpha=1)
+
+## TF-IDF
+lasso_tfidf <- cv.glmnet(as.matrix(train_tfidf[,-1]), train_tfidf$abs_price_pc, family="gaussian", alpha=1)
+
+## TDF vs. TF-IDF RMSE
+# TDF
+rmse_lasso_tdf <- sqrt(mean((predict(lasso_tdf, as.matrix(test_tdf)[,-1]) - test_tdf$abs_price_pc)^2))
+# TF-IDF
+rmse_lasso_tfidf <-sqrt(mean((predict(lasso_tfidf, as.matrix(test_tfidf)[,-1]) - test_tfidf$abs_price_pc)^2))
+```
+
+### Gradient Boosting (XGBoost)
+
+```{r predictions}
+## TDF
+# Tuning
+set.seed(617)
+tune_nrounds_xgb <- xgb.cv(
+                    data = as.matrix(train_tdf[,-1]),
+                    label = train_tdf$abs_price_pc,
+                    nrounds = 5000,
+                    objective = "reg:linear",
+                    early_stopping_rounds = 50, 
+                    nfold = 10,
+                    params = list(
+                      eta = 0.1,
+                      max_depth = 3,
+                      min_child_weight = 3,
+                      subsample = 0.8,
+                      colsample_bytree = 1.0),
+                    verbose = 1
+                  )  
+
+# Minimum test CV RMSE
+which.min(tune_nrounds_xgb$evaluation_log$test_rmse_mean) #65
+
+# Grid search
+hyper_grid <- expand.grid(
+                    eta = 0.01,
+                    max_depth = c(3,5,7,9), 
+                    min_child_weight = c(3,5,7,9),
+                    subsample = 0.5, 
+                    colsample_bytree = 0.5,
+                    gamma = c(0, 1, 5, 10),
+                    lambda = c(0, 1e-2, 0.1, 1),
+                    alpha = c(0, 1e-2, 0.1, 1),
+                    rmse = 0,         
+                    trees = 0)
+
+for (i in seq_len(nrow(hyper_grid))) {
+  set.seed(617)
+  hyper_p <- xgb.cv(
+    data = as.matrix(train_tdf[,-1]),
+    label = train_tdf$abs_price_pc,
+    nrounds = 65,
+    objective = "reg:linear",
+    early_stopping_rounds = 30, 
+    nfold = 10,
+    verbose = 1,
+    params = list( 
+      eta = hyper_grid$eta[i], 
+      max_depth = hyper_grid$max_depth[i],
+      min_child_weight = hyper_grid$min_child_weight[i],
+      subsample = hyper_grid$subsample[i],
+      colsample_bytree = hyper_grid$colsample_bytree[i],
+      gamma = hyper_grid$gamma[i], 
+      lambda = hyper_grid$lambda[i], 
+      alpha = hyper_grid$alpha[i]
+    ) 
+  )
+  hyper_grid$rmse[i] <- min(hyper_p$evaluation_log$test_rmse_mean)
+  hyper_grid$trees[i] <- hyper_p$best_iteration
+}
+
+params <- list(
+  eta = 0.01,
+  max_depth = 9,
+  min_child_weight = 9,
+  subsample = 0.5,
+  colsample_bytree = 0.5,
+  gamma = 10,
+  lambda = 1,
+  alpha = 1
+)
+
+xgb_final_tdf <- xgboost(
+                  params = params,
+                  data = as.matrix(train_tdf[,-1]),
+                  label = train_tdf$abs_price_pc,
+                  nrounds = 65,
+                  objective = "reg:linear",
+                  verbose = 0)
+
+xgb_pred_tdf <- predict(xgb_final_tdf, newdata=as.matrix(test_tdf[,-1]))
+rmse_xgboost_tdf <-sqrt(mean((xgb_pred_tdf - test_tdf$abs_price_pc)^2)); rmse_xgboost_tdf
+
+## TDF
+# Tuning
+set.seed(617)
+tune_nrounds_xgb <- xgb.cv(
+                    data = as.matrix(train_tfidf[,-1]),
+                    label = train_tfidf$abs_price_pc,
+                    nrounds = 5000,
+                    objective = "reg:linear",
+                    early_stopping_rounds = 50, 
+                    nfold = 10,
+                    params = list(
+                      eta = 0.1,
+                      max_depth = 3,
+                      min_child_weight = 3,
+                      subsample = 0.8,
+                      colsample_bytree = 1.0),
+                    verbose = 1
+                  )  
+
+# Minimum test CV RMSE
+which.min(tune_nrounds_xgb$evaluation_log$test_rmse_mean) #65
+
+# Grid search
+hyper_grid <- expand.grid(
+                    eta = 0.01,
+                    max_depth = c(3,5,7,9), 
+                    min_child_weight = c(3,5,7,9),
+                    subsample = 0.5, 
+                    colsample_bytree = 0.5,
+                    gamma = c(0, 1, 5, 10),
+                    lambda = c(0, 1e-2, 0.1, 1),
+                    alpha = c(0, 1e-2, 0.1, 1),
+                    rmse = 0,         
+                    trees = 0)
+
+for (i in seq_len(nrow(hyper_grid))) {
+  set.seed(617)
+  hyper_p <- xgb.cv(
+    data = as.matrix(train_tfidf[,-1]),
+    label = train_tfidf$abs_price_pc,
+    nrounds = 65,
+    objective = "reg:linear",
+    early_stopping_rounds = 30, 
+    nfold = 10,
+    verbose = 0,
+    params = list( 
+      eta = hyper_grid$eta[i], 
+      max_depth = hyper_grid$max_depth[i],
+      min_child_weight = hyper_grid$min_child_weight[i],
+      subsample = hyper_grid$subsample[i],
+      colsample_bytree = hyper_grid$colsample_bytree[i],
+      gamma = hyper_grid$gamma[i], 
+      lambda = hyper_grid$lambda[i], 
+      alpha = hyper_grid$alpha[i]
+    ) 
+  )
+  hyper_grid$rmse[i] <- min(hyper_p$evaluation_log$test_rmse_mean)
+  hyper_grid$trees[i] <- hyper_p$best_iteration
+}
+
+params <- list(
+  eta = 0.01,
+  max_depth = 9,
+  min_child_weight = 9,
+  subsample = 0.5,
+  colsample_bytree = 0.5,
+  gamma = 10,
+  lambda = 1,
+  alpha = 1
+)
+
+xgb_final_tfidf <- xgboost(
+                  params = params,
+                  data = as.matrix(train_tfidf[,-1]),
+                  label = train_tfidf$abs_price_pc,
+                  nrounds = 65,
+                  objective = "reg:linear",
+                  verbose = 0)
+
+xgb_pred_tfidf <- predict(xgb_final_tfidf, newdata=as.matrix(test_tfidf[,-1]))
+rmse_xgboost_tfidf <-sqrt(mean((xgb_pred_tfidf - test_tfidf$abs_price_pc)^2)); rmse_xgboost_tfidf 
+```
+
+### RMSE Comparison
+#### Lasso & XGBoost
+
+```{r comparison}
+RMSE_df1 <- data.frame(models = c('CV Lasso tdf', 'CV Lasso tfidf', 'Tuned XGBoost tdf', 'Tuned XGBoost tfidf'), 
+                       RMSE = c(rmse_lasso_tdf, rmse_lasso_tfidf, rmse_xgboost_tdf, rmse_xgboost_tfidf))
+
+RMSE_df1
+```
+
+### Dimensionality Reduction (Optional Section)
+
+```{r predictions}
+## TDF
+trainPredictors_tdf = train_tdf[,-1]
+testPredictors_tdf = test_tdf[,-1]
+
+train_tdf_pca = prcomp(trainPredictors_tdf,scale. = T)
+plot(train_tdf_pca, type = 'line')
+
+# Eigenvalue criterion (selecting the number of PCs)
+eigen <- train_tdf_pca$sdev %>%
+  as.vector() %>%
+  .^2
+sum(eigen)
+which(eigen >= 1)
+
+train_components_tdf = data.frame(cbind(abs_price_pc = train_tdf$abs_price_pc, train_tdf_pca$x[,1:58]))
+
+# Transforms original data to PCA space
+test_tdf_pca = predict(train_tdf_pca, newdata=testPredictors_tdf)
+test_components_tdf = data.frame(cbind(abs_price_pc = test_tdf$abs_price_pc, test_tdf_pca [,1:58]))
+
+## TF-IDF
+trainPredictors_tfidf = train_tfidf[,-1]
+testPredictors_tfidf = test_tfidf[,-1]
+
+train_tfidf_pca = prcomp(trainPredictors_tfidf,scale. = T)
+plot(train_tfidf_pca, type = 'line')
+
+# Eigenvalue criterion (selecting the number of PCs)
+eigen <- train_tfidf_pca$sdev %>%
+  as.vector() %>%
+  .^2
+sum(eigen)
+which(eigen >= 1)
+
+train_components_tfidf = data.frame(cbind(abs_price_pc = train_tfidf$abs_price_pc, train_tfidf_pca$x[,1:58]))
+
+# Transforms original data to PCA space
+test_tfidf_pca = predict(train_tfidf_pca, newdata=testPredictors_tfidf)
+test_components_tfidf = data.frame(cbind(abs_price_pc = test_tfidf$abs_price_pc, test_tfidf_pca [,1:58]))
+```

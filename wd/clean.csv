@@ -1,0 +1,150 @@
+,GameId,HomeTeam,AwayTeam,Home_Score,Away_Score,WTeamID,WScore,LTeamID,LScore,Wloc
+1,1,Virginia Tech Hokies,Notre Dame Fighting Irish,81,66,Virginia Tech Hokies,81,Notre Dame Fighting Irish,66,H
+2,10,Wake Forest Demon Deacons,Duke Blue Devils,65,87,Duke Blue Devils,87,Wake Forest Demon Deacons,65,A
+3,100,Georgia Tech Yellow Jackets,Pittsburgh Panthers,73,65,Georgia Tech Yellow Jackets,73,Pittsburgh Panthers,65,H
+4,101,Syracuse Orange,Duke Blue Devils,65,75,Duke Blue Devils,75,Syracuse Orange,65,A
+5,102,Louisville Cardinals,Virginia Cavaliers,52,64,Virginia Cavaliers,64,Louisville Cardinals,52,A
+6,103,Clemson Tigers,Boston College Eagles,76,66,Clemson Tigers,76,Boston College Eagles,66,H
+7,104,Miami (FL) Hurricanes,Georgia Tech Yellow Jackets,80,65,Miami (FL) Hurricanes,80,Georgia Tech Yellow Jackets,65,H
+8,105,North Carolina Tar Heels,Florida State Seminoles,77,59,North Carolina Tar Heels,77,Florida State Seminoles,59,H
+9,106,Notre Dame Fighting Irish,Virginia Tech Hokies,59,67,Virginia Tech Hokies,67,Notre Dame Fighting Irish,59,A
+10,107,North Carolina State Wolfpack,Wake Forest Demon Deacons,94,74,North Carolina State Wolfpack,94,Wake Forest Demon Deacons,74,H
+11,108,Florida State Seminoles,Notre Dame Fighting Irish,68,61,Florida State Seminoles,68,Notre Dame Fighting Irish,61,H
+12,109,Virginia Tech Hokies,Duke Blue Devils,77,72,Virginia Tech Hokies,77,Duke Blue Devils,72,H
+13,11,North Carolina State Wolfpack,North Carolina Tar Heels,82,90,North Carolina Tar Heels,90,North Carolina State Wolfpack,82,A
+14,110,Wake Forest Demon Deacons,Miami (FL) Hurricanes,76,75,Wake Forest Demon Deacons,76,Miami (FL) Hurricanes,75,H
+15,111,North Carolina Tar Heels,Syracuse Orange,93,85,North Carolina Tar Heels,93,Syracuse Orange,85,H
+16,112,Pittsburgh Panthers,Clemson Tigers,48,62,Clemson Tigers,62,Pittsburgh Panthers,48,A
+17,113,Virginia Cavaliers,Georgia Tech Yellow Jackets,81,51,Virginia Cavaliers,81,Georgia Tech Yellow Jackets,51,H
+18,114,Boston College Eagles,Louisville Cardinals,66,59,Boston College Eagles,66,Louisville Cardinals,59,H
+19,115,Clemson Tigers,North Carolina Tar Heels,79,81,North Carolina Tar Heels,81,Clemson Tigers,79,A
+20,116,Florida State Seminoles,North Carolina State Wolfpack,78,73,Florida State Seminoles,78,North Carolina State Wolfpack,73,H
+21,117,Wake Forest Demon Deacons,Syracuse Orange,54,79,Syracuse Orange,79,Wake Forest Demon Deacons,54,A
+22,118,Virginia Cavaliers,Pittsburgh Panthers,73,49,Virginia Cavaliers,73,Pittsburgh Panthers,49,H
+23,119,Duke Blue Devils,Miami (FL) Hurricanes,87,57,Duke Blue Devils,87,Miami (FL) Hurricanes,57,H
+24,12,Georgia Tech Yellow Jackets,Virginia Tech Hokies,49,52,Virginia Tech Hokies,52,Georgia Tech Yellow Jackets,49,A
+25,120,Louisville Cardinals,Notre Dame Fighting Irish,75,61,Louisville Cardinals,75,Notre Dame Fighting Irish,61,H
+26,121,Georgia Tech Yellow Jackets,Boston College Eagles,81,78,Georgia Tech Yellow Jackets,81,Boston College Eagles,78,H
+27,122,Syracuse Orange,Virginia Cavaliers,53,79,Virginia Cavaliers,79,Syracuse Orange,53,A
+28,123,Duke Blue Devils,Wake Forest Demon Deacons,71,70,Duke Blue Devils,71,Wake Forest Demon Deacons,70,H
+29,124,Florida State Seminoles,Virginia Tech Hokies,73,64,Florida State Seminoles,73,Virginia Tech Hokies,64,H
+30,125,Miami (FL) Hurricanes,Pittsburgh Panthers,76,63,Miami (FL) Hurricanes,76,Pittsburgh Panthers,63,H
+31,126,Boston College Eagles,North Carolina Tar Heels,66,79,North Carolina Tar Heels,79,Boston College Eagles,66,A
+32,127,Notre Dame Fighting Irish,Clemson Tigers,62,64,Clemson Tigers,64,Notre Dame Fighting Irish,62,A
+33,128,North Carolina State Wolfpack,Georgia Tech Yellow Jackets,61,63,Georgia Tech Yellow Jackets,63,North Carolina State Wolfpack,61,A
+34,129,Virginia Tech Hokies,Miami (FL) Hurricanes,84,70,Virginia Tech Hokies,84,Miami (FL) Hurricanes,70,H
+35,13,Syracuse Orange,Clemson Tigers,61,53,Syracuse Orange,61,Clemson Tigers,53,H
+36,130,Virginia Cavaliers,Louisville Cardinals,73,68,Virginia Cavaliers,73,Louisville Cardinals,68,H
+37,131,Wake Forest Demon Deacons,Florida State Seminoles,57,65,Florida State Seminoles,65,Wake Forest Demon Deacons,57,A
+38,132,Clemson Tigers,Syracuse Orange,67,55,Clemson Tigers,67,Syracuse Orange,55,H
+39,133,Pittsburgh Panthers,Notre Dame Fighting Irish,56,53,Pittsburgh Panthers,56,Notre Dame Fighting Irish,53,H
+40,134,Boston College Eagles,North Carolina State Wolfpack,47,73,North Carolina State Wolfpack,73,Boston College Eagles,47,A
+41,135,North Carolina Tar Heels,Duke Blue Devils,79,70,North Carolina Tar Heels,79,Duke Blue Devils,70,H
+42,136,Miami (FL) Hurricanes,Wake Forest Demon Deacons,79,71,Miami (FL) Hurricanes,79,Wake Forest Demon Deacons,71,H
+43,137,Georgia Tech Yellow Jackets,Notre Dame Fighting Irish,71,78,Notre Dame Fighting Irish,78,Georgia Tech Yellow Jackets,71,A
+44,138,Boston College Eagles,Pittsburgh Panthers,70,80,Pittsburgh Panthers,80,Boston College Eagles,70,A
+45,139,North Carolina State Wolfpack,Clemson Tigers,59,58,North Carolina State Wolfpack,59,Clemson Tigers,58,H
+46,14,Pittsburgh Panthers,Louisville Cardinals,89,86,Pittsburgh Panthers,89,Louisville Cardinals,86,H
+47,140,Virginia Tech Hokies,Miami (FL) Hurricanes,71,56,Virginia Tech Hokies,71,Miami (FL) Hurricanes,56,H
+48,141,Louisville Cardinals,Notre Dame Fighting Irish,75,53,Louisville Cardinals,75,Notre Dame Fighting Irish,53,H
+49,142,Syracuse Orange,Pittsburgh Panthers,73,59,Syracuse Orange,73,Pittsburgh Panthers,59,H
+50,143,Virginia Cavaliers,North Carolina State Wolfpack,76,56,Virginia Cavaliers,76,North Carolina State Wolfpack,56,H
+51,144,Florida State Seminoles,Virginia Tech Hokies,65,63,Florida State Seminoles,65,Virginia Tech Hokies,63,H
+52,145,North Carolina Tar Heels,Louisville Cardinals,83,70,North Carolina Tar Heels,83,Louisville Cardinals,70,H
+53,146,Duke Blue Devils,Syracuse Orange,84,72,Duke Blue Devils,84,Syracuse Orange,72,H
+54,147,Virginia Cavaliers,Florida State Seminoles,59,69,Florida State Seminoles,69,Virginia Cavaliers,59,A
+55,148,North Carolina Tar Heels,Duke Blue Devils,73,74,Duke Blue Devils,74,North Carolina Tar Heels,73,A
+56,149,Duke Blue Devils,Florida State Seminoles,73,63,Duke Blue Devils,73,Florida State Seminoles,63,H
+57,15,Florida State Seminoles,Miami (FL) Hurricanes,68,62,Florida State Seminoles,68,Miami (FL) Hurricanes,62,H
+58,16,Boston College Eagles,Virginia Cavaliers,56,83,Virginia Cavaliers,83,Boston College Eagles,56,A
+59,17,Notre Dame Fighting Irish,Boston College Eagles,69,66,Notre Dame Fighting Irish,69,Boston College Eagles,66,H
+60,18,Clemson Tigers,Virginia Cavaliers,43,63,Virginia Cavaliers,63,Clemson Tigers,43,A
+61,19,North Carolina State Wolfpack,Pittsburgh Panthers,86,80,North Carolina State Wolfpack,86,Pittsburgh Panthers,80,H
+62,2,Miami (FL) Hurricanes,North Carolina State Wolfpack,82,87,North Carolina State Wolfpack,87,Miami (FL) Hurricanes,82,A
+63,20,North Carolina Tar Heels,Louisville Cardinals,62,83,Louisville Cardinals,83,North Carolina Tar Heels,62,A
+64,21,Florida State Seminoles,Duke Blue Devils,78,80,Duke Blue Devils,80,Florida State Seminoles,78,A
+65,22,Miami (FL) Hurricanes,Wake Forest Demon Deacons,76,65,Miami (FL) Hurricanes,76,Wake Forest Demon Deacons,65,H
+66,23,Syracuse Orange,Georgia Tech Yellow Jackets,59,73,Georgia Tech Yellow Jackets,73,Syracuse Orange,59,A
+67,24,Duke Blue Devils,Syracuse Orange,91,95,Syracuse Orange,95,Duke Blue Devils,91,A
+68,25,Pittsburgh Panthers,Florida State Seminoles,75,62,Pittsburgh Panthers,75,Florida State Seminoles,62,H
+69,26,Wake Forest Demon Deacons,North Carolina State Wolfpack,71,67,Wake Forest Demon Deacons,71,North Carolina State Wolfpack,67,H
+70,27,Virginia Cavaliers,Virginia Tech Hokies,81,59,Virginia Cavaliers,81,Virginia Tech Hokies,59,H
+71,28,North Carolina Tar Heels,Notre Dame Fighting Irish,75,69,North Carolina Tar Heels,75,Notre Dame Fighting Irish,69,H
+72,29,Louisville Cardinals,Boston College Eagles,80,70,Louisville Cardinals,80,Boston College Eagles,70,H
+73,3,Duke Blue Devils,Clemson Tigers,87,68,Duke Blue Devils,87,Clemson Tigers,68,H
+74,30,Clemson Tigers,Georgia Tech Yellow Jackets,72,60,Clemson Tigers,72,Georgia Tech Yellow Jackets,60,H
+75,31,Duke Blue Devils,Virginia Cavaliers,72,70,Duke Blue Devils,72,Virginia Cavaliers,70,H
+76,32,Miami (FL) Hurricanes,North Carolina Tar Heels,76,85,North Carolina Tar Heels,85,Miami (FL) Hurricanes,76,A
+77,33,Notre Dame Fighting Irish,North Carolina State Wolfpack,73,77,North Carolina State Wolfpack,77,Notre Dame Fighting Irish,73,A
+78,34,Syracuse Orange,Pittsburgh Panthers,74,63,Syracuse Orange,74,Pittsburgh Panthers,63,H
+79,35,Virginia Tech Hokies,Wake Forest Demon Deacons,87,71,Virginia Tech Hokies,87,Wake Forest Demon Deacons,71,H
+80,36,Georgia Tech Yellow Jackets,Louisville Cardinals,51,79,Louisville Cardinals,79,Georgia Tech Yellow Jackets,51,A
+81,37,Boston College Eagles,Florida State Seminoles,87,82,Boston College Eagles,87,Florida State Seminoles,82,H
+82,38,North Carolina Tar Heels,Virginia Tech Hokies,103,82,North Carolina Tar Heels,103,Virginia Tech Hokies,82,H
+83,39,Florida State Seminoles,Clemson Tigers,77,68,Florida State Seminoles,77,Clemson Tigers,68,H
+84,4,Virginia Tech Hokies,Boston College Eagles,77,66,Virginia Tech Hokies,77,Boston College Eagles,66,H
+85,40,Georgia Tech Yellow Jackets,Notre Dame Fighting Irish,63,61,Georgia Tech Yellow Jackets,63,Notre Dame Fighting Irish,61,H
+86,41,Virginia Cavaliers,Wake Forest Demon Deacons,68,45,Virginia Cavaliers,68,Wake Forest Demon Deacons,45,H
+87,42,Pittsburgh Panthers,Duke Blue Devils,64,79,Duke Blue Devils,79,Pittsburgh Panthers,64,A
+88,43,Louisville Cardinals,North Carolina State Wolfpack,84,77,Louisville Cardinals,84,North Carolina State Wolfpack,77,H
+89,44,Syracuse Orange,Miami (FL) Hurricanes,73,53,Syracuse Orange,73,Miami (FL) Hurricanes,53,H
+90,45,Duke Blue Devils,Georgia Tech Yellow Jackets,66,53,Duke Blue Devils,66,Georgia Tech Yellow Jackets,53,H
+91,46,Notre Dame Fighting Irish,Virginia Cavaliers,55,82,Virginia Cavaliers,82,Notre Dame Fighting Irish,55,A
+92,47,Louisville Cardinals,Pittsburgh Panthers,66,51,Louisville Cardinals,66,Pittsburgh Panthers,51,H
+93,48,North Carolina State Wolfpack,Clemson Tigers,69,67,North Carolina State Wolfpack,69,Clemson Tigers,67,H
+94,49,Wake Forest Demon Deacons,Boston College Eagles,61,65,Boston College Eagles,65,Wake Forest Demon Deacons,61,A
+95,5,Notre Dame Fighting Irish,Syracuse Orange,62,72,Syracuse Orange,72,Notre Dame Fighting Irish,62,A
+96,50,Virginia Tech Hokies,Syracuse Orange,78,56,Virginia Tech Hokies,78,Syracuse Orange,56,H
+97,51,Miami (FL) Hurricanes,Florida State Seminoles,66,78,Florida State Seminoles,78,Miami (FL) Hurricanes,66,A
+98,52,Notre Dame Fighting Irish,Duke Blue Devils,61,83,Duke Blue Devils,83,Notre Dame Fighting Irish,61,A
+99,53,North Carolina State Wolfpack,Virginia Cavaliers,65,66,Virginia Cavaliers,66,North Carolina State Wolfpack,65,A
+100,54,Georgia Tech Yellow Jackets,North Carolina Tar Heels,54,77,North Carolina Tar Heels,77,Georgia Tech Yellow Jackets,54,A
+101,55,Clemson Tigers,Pittsburgh Panthers,82,69,Clemson Tigers,82,Pittsburgh Panthers,69,H
+102,56,Miami (FL) Hurricanes,Virginia Tech Hokies,70,82,Virginia Tech Hokies,82,Miami (FL) Hurricanes,70,A
+103,57,Boston College Eagles,Syracuse Orange,71,77,Syracuse Orange,77,Boston College Eagles,71,A
+104,58,Wake Forest Demon Deacons,Louisville Cardinals,54,82,Louisville Cardinals,82,Wake Forest Demon Deacons,54,A
+105,59,Louisville Cardinals,North Carolina Tar Heels,69,79,North Carolina Tar Heels,79,Louisville Cardinals,69,A
+106,6,Pittsburgh Panthers,North Carolina Tar Heels,60,85,North Carolina Tar Heels,85,Pittsburgh Panthers,60,A
+107,60,North Carolina State Wolfpack,Virginia Tech Hokies,24,47,Virginia Tech Hokies,47,North Carolina State Wolfpack,24,A
+108,61,Florida State Seminoles,Georgia Tech Yellow Jackets,59,49,Florida State Seminoles,59,Georgia Tech Yellow Jackets,49,H
+109,62,Boston College Eagles,Notre Dame Fighting Irish,73,79,Notre Dame Fighting Irish,79,Boston College Eagles,73,A
+110,63,Virginia Cavaliers,Miami (FL) Hurricanes,56,46,Virginia Cavaliers,56,Miami (FL) Hurricanes,46,H
+111,64,Pittsburgh Panthers,Syracuse Orange,56,65,Syracuse Orange,65,Pittsburgh Panthers,56,A
+112,65,Clemson Tigers,Wake Forest Demon Deacons,64,37,Clemson Tigers,64,Wake Forest Demon Deacons,37,H
+113,66,Virginia Tech Hokies,Louisville Cardinals,64,72,Louisville Cardinals,72,Virginia Tech Hokies,64,A
+114,67,Duke Blue Devils,Boston College Eagles,80,55,Duke Blue Devils,80,Boston College Eagles,55,H
+115,68,Wake Forest Demon Deacons,Pittsburgh Panthers,78,76,Wake Forest Demon Deacons,78,Pittsburgh Panthers,76,H
+116,69,North Carolina Tar Heels,North Carolina State Wolfpack,113,96,North Carolina Tar Heels,113,North Carolina State Wolfpack,96,H
+117,7,Georgia Tech Yellow Jackets,Wake Forest Demon Deacons,92,79,Georgia Tech Yellow Jackets,92,Wake Forest Demon Deacons,79,H
+118,70,Syracuse Orange,Florida State Seminoles,62,80,Florida State Seminoles,80,Syracuse Orange,62,A
+119,71,Georgia Tech Yellow Jackets,Clemson Tigers,42,65,Clemson Tigers,65,Georgia Tech Yellow Jackets,42,A
+120,72,Miami (FL) Hurricanes,Notre Dame Fighting Irish,62,47,Miami (FL) Hurricanes,62,Notre Dame Fighting Irish,47,H
+121,73,North Carolina Tar Heels,Miami (FL) Hurricanes,88,85,North Carolina Tar Heels,88,Miami (FL) Hurricanes,85,H
+122,74,Clemson Tigers,Virginia Tech Hokies,59,51,Clemson Tigers,59,Virginia Tech Hokies,51,H
+123,75,Pittsburgh Panthers,North Carolina State Wolfpack,76,79,North Carolina State Wolfpack,79,Pittsburgh Panthers,76,A
+124,76,Syracuse Orange,Boston College Eagles,67,56,Syracuse Orange,67,Boston College Eagles,56,H
+125,77,Florida State Seminoles,Louisville Cardinals,80,75,Florida State Seminoles,80,Louisville Cardinals,75,H
+126,78,Virginia Cavaliers,Duke Blue Devils,71,81,Duke Blue Devils,81,Virginia Cavaliers,71,A
+127,79,Notre Dame Fighting Irish,Georgia Tech Yellow Jackets,69,59,Notre Dame Fighting Irish,69,Georgia Tech Yellow Jackets,59,H
+128,8,Virginia Cavaliers,Florida State Seminoles,65,52,Virginia Cavaliers,65,Florida State Seminoles,52,H
+129,80,North Carolina Tar Heels,Virginia Cavaliers,61,69,Virginia Cavaliers,69,North Carolina Tar Heels,61,A
+130,81,Boston College Eagles,Pittsburgh Panthers,66,57,Boston College Eagles,66,Pittsburgh Panthers,57,H
+131,82,Louisville Cardinals,Duke Blue Devils,69,71,Duke Blue Devils,71,Louisville Cardinals,69,A
+132,83,Miami (FL) Hurricanes,Clemson Tigers,65,64,Miami (FL) Hurricanes,65,Clemson Tigers,64,H
+133,84,Florida State Seminoles,Wake Forest Demon Deacons,88,66,Florida State Seminoles,88,Wake Forest Demon Deacons,66,H
+134,85,North Carolina State Wolfpack,Syracuse Orange,73,58,North Carolina State Wolfpack,73,Syracuse Orange,58,H
+135,86,Virginia Tech Hokies,Georgia Tech Yellow Jackets,76,68,Virginia Tech Hokies,76,Georgia Tech Yellow Jackets,68,H
+136,87,Duke Blue Devils,North Carolina State Wolfpack,94,78,Duke Blue Devils,94,North Carolina State Wolfpack,78,H
+137,88,Wake Forest Demon Deacons,North Carolina Tar Heels,57,95,North Carolina Tar Heels,95,Wake Forest Demon Deacons,57,A
+138,89,Louisville Cardinals,Clemson Tigers,56,55,Louisville Cardinals,56,Clemson Tigers,55,H
+139,9,Louisville Cardinals,Miami (FL) Hurricanes,90,73,Louisville Cardinals,90,Miami (FL) Hurricanes,73,H
+140,90,Virginia Cavaliers,Notre Dame Fighting Irish,60,54,Virginia Cavaliers,60,Notre Dame Fighting Irish,54,H
+141,91,Georgia Tech Yellow Jackets,Florida State Seminoles,47,69,Florida State Seminoles,69,Georgia Tech Yellow Jackets,47,A
+142,92,Pittsburgh Panthers,Virginia Tech Hokies,64,70,Virginia Tech Hokies,70,Pittsburgh Panthers,64,A
+143,93,Boston College Eagles,Miami (FL) Hurricanes,64,57,Boston College Eagles,64,Miami (FL) Hurricanes,57,H
+144,94,Virginia Tech Hokies,Virginia Cavaliers,58,64,Virginia Cavaliers,64,Virginia Tech Hokies,58,A
+145,95,Notre Dame Fighting Irish,Wake Forest Demon Deacons,68,75,Wake Forest Demon Deacons,75,Notre Dame Fighting Irish,68,A
+146,96,Clemson Tigers,Florida State Seminoles,64,77,Florida State Seminoles,77,Clemson Tigers,64,A
+147,97,North Carolina State Wolfpack,Boston College Eagles,89,80,North Carolina State Wolfpack,89,Boston College Eagles,80,H
+148,98,Syracuse Orange,Louisville Cardinals,69,49,Syracuse Orange,69,Louisville Cardinals,49,H
+149,99,Duke Blue Devils,North Carolina Tar Heels,72,88,North Carolina Tar Heels,88,Duke Blue Devils,72,A

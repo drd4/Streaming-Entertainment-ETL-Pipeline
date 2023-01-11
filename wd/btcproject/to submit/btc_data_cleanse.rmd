@@ -1,0 +1,96 @@
+---
+title: "Project Prosposal $BTC Cleaning"
+author: "Daniel Dasgupta"
+date: "3/1/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Packages 
+```{r, echo= FALSE}
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+library(lubridate)
+```
+
+
+
+## Read raw data from csv
+
+```{r}
+rawdata = read.csv("rawbtc.csv")
+
+dim(rawdata)
+```
+
+
+
+## Subset data to pre-selected variables, store in 'btc_df' 
+
+```{r}
+btc_df = rawdata %>%
+          select(date, PriceUSD, AdrActCnt, BlkCnt, BlkSizeByte,BlkSizeMeanByte, 
+                 CapMrktCurUSD, CapRealUSD, DiffMean, FeeMeanUSD, FeeMedUSD, 
+                 FeeTotUSD, HashRate, IssContPctAnn, IssContUSD, IssTotUSD, 
+                 ROI1yr, ROI30d, SplyCur, SplyFF, TxCnt, TxTfrCnt,
+                 TxTfrValAdjUSD, TxTfrValMeanUSD,TxTfrValMedUSD, TxTfrValUSD,
+                 VtyDayRet180d, VtyDayRet30d, VtyDayRet60d)
+
+dim(btc_df)
+
+str(btc_df)
+
+```
+
+**Convert date from character to date class**
+```{r}
+btc_df$date = as.Date(btc_df$date)
+```
+
+## Identify missing values
+
+**Table 1:  Count of missing values for each feature**
+
+```{r}
+
+
+missing_values <- btc_df %>%
+  gather(key = "key", value = "val") %>%
+  mutate(is.missing = is.na(val)) %>%
+  group_by(key, is.missing) %>%
+  summarise(num.missing = n()) %>%
+  filter(is.missing==T) %>%
+  select(-is.missing) %>%
+  arrange(desc(num.missing)) 
+
+missing_values  %>% kable()
+
+
+
+```
+
+
+## Remove N/A & Missing Values 
+
+```{r}
+
+btc_df <- na.omit(btc_df)
+
+dim(btc_df)
+
+
+```
+
+## Export to CSV for submission
+
+```{r}
+write.csv(btc_df, "clean_df_submission.csv")
+```
+
+
+
+

@@ -1,0 +1,261 @@
+---
+title: "btc_internal_model"
+author: "Daniel Dasgupta"
+date: "3/31/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+```{r}
+
+
+
+
+library(tidyverse) 
+library(corrplot)
+rawdata = read.csv("rawbtc.csv")
+
+btc_df = rawdata %>%
+  select( PriceUSD, AdrActCnt, BlkCnt, BlkSizeByte,BlkSizeMeanByte, 
+          CapMrktCurUSD, CapRealUSD, DiffMean, FeeMeanUSD, FeeMedUSD, 
+          FeeTotUSD, HashRate, IssContPctAnn, IssContUSD, IssTotUSD, 
+          ROI1yr, ROI30d, SplyCur, SplyFF, TxCnt, TxTfrCnt,
+          TxTfrValAdjUSD, TxTfrValMeanUSD,TxTfrValMedUSD, TxTfrValUSD,
+          VtyDayRet180d, VtyDayRet30d, VtyDayRet60d)
+
+
+
+btc_df <- na.omit(btc_df)
+str(btc_df)
+```
+
+## Check to see what multicollinearity looks like
+
+```{r, echo=FALSE}
+
+numericVars <- which(sapply(btc_df, is.numeric)) #index numeric variables
+
+all_numVar <- btc_df[, numericVars]
+
+
+cor_numVar <- cor(all_numVar, use="pairwise.complete.obs") #correlations of all numeric variables
+
+cor_sorted <- as.matrix(sort(cor_numVar[,'PriceUSD'], decreasing = TRUE))
+
+CorHigh <- names(which(apply(cor_sorted, 1, function(x) abs(x)>0.8)))
+cor_numVar <- cor_numVar[CorHigh, CorHigh]
+corrplot.mixed(cor_numVar, tl.col="black", tl.pos = "lt")
+```
+
+# Maybe lets try some cluster analysis 
+```{r}
+#Scale the data 
+library(mice)
+
+
+
+clust = btc_df 
+
+clust = scale(clust)
+
+#Hierarchical Cluster via Euclidean Distance
+d = dist(x = clust, method = 'euclidean')
+
+
+
+clusters = hclust(d = d, method = 'ward.D2')
+
+
+
+cor(cophenetic(clusters), d)
+#0.542 moderate fit
+
+
+
+```
+
+
+```{r, echo=FALSE}
+
+
+#display trees over 20
+
+plot(cut(as.dendrogram(clusters), h = 10)$upper)
+
+library(factoextra)
+library(gridExtra)
+library(dendextend)
+
+library(dendextend) #4 clusters
+plot(color_branches(as.dendrogram(clusters),k = 4,groupLabels = F))
+```
+
+
+```{r, echo=FALSE}
+
+
+#break up into 4 clusters
+h_segments = cutree(tree= clusters, k =4)
+
+
+#express clusters on scatterplot 
+library(psych)
+temp = data.frame(cluster = factor(h_segments),
+                  factor1 = fa(clust,nfactors = 2,rotate = 'varimax')$scores[,1],
+                  factor2 = fa(clust,nfactors = 2,rotate = 'varimax')$scores[,2])
+ggplot(temp,aes(x=factor1,y=factor2,col=cluster))+
+  geom_point()
+table(h_segments)
+
+
+```
+
+```{r}
+
+# PCA Visualizatoin 
+library(cluster)
+clusplot(clust,
+         h_segments,
+         color=T,shade=T,labels=4,lines=0,main='Hierarchical Cluster Plot')
+```
+
+
+## K Means 
+```{r, echo=FALSE}
+
+
+#determine number of centers
+
+#Total Within Sum of Squares Plot
+within_ss = sapply(1:10,FUN = function(x){
+  set.seed(617)
+  kmeans(x = clust,centers = x,iter.max = 1000,nstart = 25)$tot.withinss})
+
+ggplot(data=data.frame(cluster = 1:10,within_ss),aes(x=cluster,y=within_ss))+
+  geom_line(col='steelblue',size=1.2)+
+  geom_point()+
+  scale_x_continuous(breaks=seq(1,10,1))
+
+
+#recommend 2-4 clusters
+
+
+
+```
+
+
+```{r, echo=FALSE}
+
+#Silhouette Plot
+
+library(cluster)
+silhoette_width = sapply(2:10,
+                         FUN = function(x) pam(x = clust,k = x)$silinfo$avg.width)
+ggplot(data=data.frame(cluster = 2:10,silhoette_width),aes(x=cluster,y=silhoette_width))+
+  geom_line(col='steelblue',size=1.2)+
+  geom_point()+
+  scale_x_continuous(breaks=seq(2,10,1))
+
+```
+
+
+```{r, echo=FALSE}
+
+set.seed(617)
+
+km = kmeans(x = clust, centers = 4, iter.max = 10000, nstart = 25)
+
+k_segments = km$cluster
+table(k_segments)
+
+
+#Visualize
+library(psych)
+temp = data.frame(cluster = factor(k_segments),
+                  factor1 = fa(clust,nfactors = 2,rotate = 'varimax')$scores[,1],
+                  factor2 = fa(clust,nfactors = 2,rotate = 'varimax')$scores[,2])
+ggplot(temp,aes(x=factor1,y=factor2,col=cluster))+
+  geom_point()
+
+
+
+
+
+```
+
+
+```{r, echo=FALSE}
+
+
+
+library(cluster)
+clusplot(clust,
+         k_segments,
+         color=T,shade=T,labels=4,lines=0,main='k-means Cluster Plot')
+
+```
+
+```{r, echo=FALSE}
+
+
+#Model based clustering
+
+library(mclust)
+
+
+
+mclust_bic = sapply(1:10,FUN = function(x) -Mclust(clust,G=x)$bic)
+mclust_bic
+
+
+ggplot(data=data.frame(cluster = 1:10,bic = mclust_bic),aes(x=cluster,y=bic))+
+  geom_line(col='steelblue',size=1.2)+
+  geom_point()+
+  scale_x_continuous(breaks=seq(1,10,1))
+```
+
+
+```{r, echo=FALSE}
+
+
+#going to stick with 4 clusters
+m_clusters= Mclust(clust, G = 4)
+
+
+m_segments = m_clusters$classification
+table(m_segments)
+
+
+#viZ
+
+library(cluster)
+clusplot(clust,
+         m_segments,
+         color=T,shade=T,labels=4,lines=0,main='mclust Cluster Plot')
+
+
+
+```
+
+
+
+```{r}
+
+#profile clusters
+library(tidyverse)
+data2 = cbind(btc_df, h_segments,k_segments, m_segments)
+data2 %>%
+  group_by(k_segments)%>%
+  summarize_all(function(x) round(mean(x,na.rm=T),2))%>%
+  data.frame()
+
+
+```
+
+

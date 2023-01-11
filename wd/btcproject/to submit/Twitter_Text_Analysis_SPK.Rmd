@@ -1,0 +1,440 @@
+---
+title: "Twitter Data Text Analysis Prep"
+author: "Sung Pil Kim"
+date: "3/29/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy = F)
+```
+
+## Connect
+
+```{r packages, message=FALSE, warning=FALSE, results='hide', eval=FALSE}
+#Access to the Twitter API
+library(twitteR)
+library(ROAuth)
+
+#Text Analysis
+library(tm)
+library(wordcloud)
+
+#Data wrangling
+library(tidyverse)
+library(plyr)
+library(reshape2)
+library(skimr)
+
+#Time-Series Data
+library(xts)
+library(zoo)
+library(quantmod)
+
+#Predictive Model
+library(rpart) #Decision Tree Algorithm 
+```
+
+```{r connect, echo=FALSE, eval=FALSE}
+api_key <- '3vyA6Z1us82mgvRoYUgHpRcZR'
+api_secret_key <- 'lWyu9vlE3FAFbDLIxyE1DjVG7TElCdZmExpkiQPb2ZnW2pCk6u'
+access_token <- '3338481857-PsrafNt90CqcfLcItlR2pGL6q8rU3bSA1k5PCqR'
+access_token_secret <- 'ieOst0ZCmRYZU3pviOQ8zeql2TTegmno7q6EfnqjbB0Ty'   
+```
+
+```{r con, eval=FALSE}
+setup_twitter_oauth(api_key, api_secret_key, access_token,access_token_secret)
+```
+
+## Bitcoin Data
+
+```{r bitcoindata, message=FALSE, eval=FALSE}
+data <- read.csv('rawbtc.csv', stringsAsFactors = FALSE)
+
+#Extract only relevant data
+btc_data <- data %>% 
+              select(date, PriceUSD)
+
+#Convert the date column into date data type
+btc_data$date <- as.Date(btc_data$date)
+
+#Convert the data into time-series data d d
+btc_xts <- xts(btc_data[,'PriceUSD'], btc_data[,'date'])
+
+#The price started to be volatile in 2017
+btc_2017 <- btc_xts['20170101/20171231']
+btc_2017_mon <- split(btc_2017, f = 'months')
+
+#Find when the variance in price increased dramatically for the first time
+lapply(btc_2017_mon,FUN=var) 
+
+#Aug 2017 = starting point
+btc_ts <- as.ts(btc_xts)
+btc_ts_data <- window(btc_ts, start=2017-08-01)
+
+#Check NA values in the selected time window
+length(btc_ts_data) #2430 observations
+sum(is.na(btc_ts_data)) #0
+
+btc_df <- as.data.frame(btc_ts_data)
+
+'''
+[[1]]
+         [,1]
+[1,] 5100.091
+
+[[2]]
+         [,1]
+[1,] 5082.312
+
+[[3]]
+         [,1]
+[1,] 12897.82
+
+[[4]]
+         [,1]
+[1,] 5251.018
+
+[[5]]
+         [,1]
+[1,] 85746.17
+
+[[6]]
+         [,1]
+[1,] 23478.26
+
+[[7]]
+         [,1]
+[1,] 58013.26
+
+[[8]]
+         [,1]
+[1,] 354861.8
+
+[[9]]
+         [,1]
+[1,] 148395.1
+
+[[10]]
+         [,1]
+[1,] 476154.2
+
+[[11]]
+        [,1]
+[1,] 1243230
+
+[[12]]
+        [,1]
+[1,] 5747280
+
+[1] 2430
+[1] 0
+'''
+```
+
+
+## Extract Latest Tweets
+Extract tweets and buzz words and convert them into dataframes 
+
+```{r extract, message=FALSE, eval=FALSE}
+#Extract ElonMusk Tweets from Twitter API
+tweets_elon <- searchTwitter("ElonMusk", since = '2017-08-01', until = '2021-02-25')
+#Convert Tweets into DF
+tweets.text_elon <- twListToDF(tweets_elon)
+tweets.text_elon <- tweets.text_elon[,1]
+
+
+#Extract Bitcoin Tweets from Twitter API
+tweets_Bitcoin <- searchTwitter("Bitcoin", n = 2430)
+#Convert Tweet into DF
+tweets.text_Bitcoin <- twListToDF(tweets_Bitcoin)
+tweets.text_Bitcoin <- tweets.text_Bitcoin[,1]
+
+
+#Extract Gamestop Tweets from Twitter API
+tweets_gamestop <- searchTwitter("Gamestop", n = 2430)
+#Convert Tweet into DF
+tweets.text_gamestop <- twListToDF(tweets_gamestop)
+tweets.text_gamestop <- tweets.text_gamestop[,1]
+
+
+#Extract tothemoon buzz word Tweets from Twitter API
+tweets_tothemoon <- searchTwitter("tothemoon", n = 2430)
+#Convert Tweet into DF
+tweets.text_tothemoon <- twListToDF(tweets_tothemoon)
+tweets.text_tothemoon <- tweets.text_tothemoon[,1]
+
+
+#Extract Wallstreetbets buzz word Tweets from Twitter API
+tweets_wallstreetbets <- searchTwitter("wallstreetbets", n = 2430)
+#Convert Tweet into DF
+tweets.text_wallstreetbets <- twListToDF(tweets_wallstreetbets)
+tweets.text_wallstreetbets <- tweets.text_wallstreetbets[,1]
+
+
+#Extract Dave Tweets from Twitter API
+tweets_daveportnoy <- searchTwitter("stoolpresidente", n = 2430)
+#Convert Tweet into DF
+tweets.text_daveportnoy <- twListToDF(tweets_daveportnoy)
+tweets.text_daveportnoy <- tweets.text_daveportnoy[,1]
+
+```
+
+## Data Preparation {.tabset}
+### 1
+#### Create a corpus
+Create a corpus for each buzz word and tweet
+
+```{r creatingCorpus, eval=FALSE}
+#Text Corpus Elon 
+tweet.corpus_elon <- VCorpus(VectorSource(tweets.text_elon))
+
+#Text Corpus Bitcoin
+tweet.corpus_Bitcoin <- VCorpus(VectorSource(tweets.text_Bitcoin))
+
+#Text Corpus Gamestop
+tweet.corpus_gamestop <- VCorpus(VectorSource(tweets.text_gamestop))
+
+#Text Corupus To The Moon
+tweet.corpus_tothemoon <- VCorpus(VectorSource(tweets.text_tothemoon))
+
+#Text Corupus Wall Street Bets
+tweet.corpus_wallstreetbets <- VCorpus(VectorSource(tweets.text_wallstreetbets))
+
+#Text Corupus Dave Portnoy 
+tweet.corpus_daveportnoy <- VCorpus(VectorSource(tweets.text_daveportnoy))
+
+```
+
+### 2
+#### Text Cleaning Functions
+
+```{r removingWords, eval=FALSE}
+tweet.removeURL = function(x)gsub("http[^[:space:]]*","",x)
+tweet.removeATUser = function(x) gsub("@[a-z,A_Z]*","",x)
+tweet.removeEmoji = function(x)gsub("\\p{So}|\\p{Cn}","",x,perl = TRUE)
+tweet.removeSpecialChar = function(x)gsub("[^[:alnum:]///']","",x)
+
+
+text_cleaning <- function(x) {
+  x <- tm_map(x, content_transformer(tolower))
+  x <- tm_map(x, content_transformer(tweet.removeURL))
+  x <- tm_map(x, content_transformer(tweet.removeATUser))
+  x <- tm_map(x, content_transformer(tweet.removeEmoji))
+  x <- tm_map(x, removePunctuation, preserve_intra_word_dashes = TRUE)
+  x <- tm_map(x, removeWords, c(stopwords("english"), "RT", "rt", "and", "a", "the", "also"))
+  x <- tm_map(x, removeNumbers)
+  x <- tm_map(x, stripWhitespace)
+}
+```
+
+
+## Analysis Preparation {.tabset}
+### Elon Tweets 
+#### Remove & Clean
+
+```{r elon, eval=FALSE}
+#Create a dictionary to stem words
+elon_original_corpus <- tweet.corpus_elon
+elon_dtm <- DocumentTermMatrix(elon_original_corpus)
+elon_dict <- findFreqTerms(elon_dtm, lowfreq = 0)
+elon_dict_corpus <- VCorpus(VectorSource(elon_dict))
+
+#Cleaning Process
+tweet.corpus_elon <- text_cleaning(tweet.corpus_elon)
+
+#Elon Tweets TF-IDF
+elon_dtm_tfidf <- DocumentTermMatrix(x=tweet.corpus_elon,
+                                     control = list(weighting=function(x) weightTfIdf(x, normalize=FALSE)))
+elon_xdtm_tfidf <- removeSparseTerms(elon_dtm_tfidf,sparse = 0.95)
+elon_xdtm_tfidf <- as.data.frame(as.matrix(elon_xdtm_tfidf))
+colnames(elon_xdtm_tfidf) <- stemCompletion(x = colnames(elon_xdtm_tfidf),
+                                            dictionary = elon_original_corpus,
+                                            type='prevalent')
+colnames(elon_xdtm_tfidf) <- make.names(colnames(elon_xdtm_tfidf))
+head(sort(colSums(elon_xdtm_tfidf),decreasing = T), 10)
+
+'''
+ elonetop.       will        see      first     called   electric       made          X lawnmower.     enough 
+  766.4161   732.0599   596.3667   585.8701   562.9399   560.2073   560.2073   554.7097   551.9446   533.7240 
+'''
+```
+
+### Bitcoin Tweets
+#### Remove & Clean 
+
+```{r bitcoin, eval=FALSE}
+#Create a dictionary to stem words
+bitcoin_original_corpus <- tweet.corpus_Bitcoin
+bitcoin_dtm <- DocumentTermMatrix(bitcoin_original_corpus)
+bitcoin_dict <- findFreqTerms(bitcoin_dtm, lowfreq = 0)
+bitcoin_dict_corpus <- VCorpus(VectorSource(bitcoin_dict))
+
+#Cleaning Process
+tweet.corpus_Bitcoin <- text_cleaning(tweet.corpus_Bitcoin)
+
+#Bitcoin Tweets TF-IDF
+bitcoin_dtm_tfidf <- DocumentTermMatrix(x=tweet.corpus_Bitcoin,
+                                        control = list(weighting=function(x) weightTfIdf(x, normalize=FALSE)))
+bitcoin_xdtm_tfidf <- removeSparseTerms(bitcoin_dtm_tfidf,sparse = 0.95)
+bitcoin_xdtm_tfidf <- as.data.frame(as.matrix(bitcoin_xdtm_tfidf))
+colnames(bitcoin_xdtm_tfidf) <- stemCompletion(x = colnames(bitcoin_xdtm_tfidf),
+                                               dictionary = bitcoin_original_corpus,
+                                               type='prevalent')
+colnames(bitcoin_xdtm_tfidf) <- make.names(colnames(bitcoin_xdtm_tfidf))
+head(sort(colSums(bitcoin_xdtm_tfidf),decreasing = T), 10)
+
+'''
+  bitcoin    crypto       btc   airdrop   joining      will         X  complete    tokens       นาที 
+1213.1561  846.2423  828.0637  754.2179  705.1667  687.7959  673.5635  664.2177  659.4954  659.4954 
+'''
+```
+
+### GameStop Tweets
+#### Remove & Clean -> TF-IDF
+
+```{r gamestop, eval=FALSE}
+#Create a dictionary to stem words
+gs_original_corpus <- tweet.corpus_gamestop
+gs_dtm <- DocumentTermMatrix(gs_original_corpus)
+gs_dict <- findFreqTerms(gs_dtm, lowfreq = 0)
+gs_dict_corpus <- VCorpus(VectorSource(gs_dict))
+
+#Cleaning Process
+tweet.corpus_gamestop <- text_cleaning(tweet.corpus_gamestop)
+
+#GameStop Tweets TF-IDF
+gs_dtm_tfidf <- DocumentTermMatrix(x=tweet.corpus_gamestop,
+                                   control = list(weighting=function(x) weightTfIdf(x, normalize=FALSE)))
+gs_xdtm_tfidf <- removeSparseTerms(gs_dtm_tfidf,sparse = 0.95)
+gs_xdtm_tfidf <- as.data.frame(as.matrix(gs_xdtm_tfidf))
+colnames(gs_xdtm_tfidf) <- stemCompletion(x = colnames(gs_xdtm_tfidf),
+                                          dictionary = gs_original_corpus,
+                                          type='prevalent')
+colnames(gs_xdtm_tfidf) <- make.names(colnames(gs_xdtm_tfidf))
+head(sort(colSums(gs_xdtm_tfidf),decreasing = T), 10)
+
+'''
+     long     wants     yolo.  gamestop       gme      time       buy     wants       guy    little 
+1121.0379 1102.3535 1099.6759 1049.5175 1013.9233  630.4476  587.1878  584.4223  577.8919  573.7641 
+'''
+```
+
+### "To the Moon" Tweets
+#### Remove & Clean
+
+```{r tothemoon, eval=FALSE}
+#Create a dictionary to stem words
+tothemoon_original_corpus <- tweet.corpus_tothemoon
+tothemoon_dtm <- DocumentTermMatrix(tothemoon_original_corpus)
+tothemoon_dict <- findFreqTerms(tothemoon_dtm, lowfreq = 0)
+tothemoon_dict_corpus <- VCorpus(VectorSource(tothemoon_dict))
+
+#Cleaning Process
+tweet.corpus_tothemoonp <- text_cleaning(tweet.corpus_tothemoon)
+
+#"To the Moon" Tweets TF-IDF
+tothemoon_dtm_tfidf <- DocumentTermMatrix(x=tweet.corpus_tothemoon,
+                                          control = list(weighting=function(x) weightTfIdf(x, normalize=FALSE)))
+tothemoon_xdtm_tfidf <- removeSparseTerms(tothemoon_dtm_tfidf,sparse = 0.95)
+tothemoon_xdtm_tfidf <- as.data.frame(as.matrix(tothemoon_xdtm_tfidf))
+colnames(tothemoon_xdtm_tfidf) <- stemCompletion(x = colnames(tothemoon_xdtm_tfidf),
+                                                 dictionary = tothemoon_original_corpus,
+                                                 type='prevalent')
+colnames(tothemoon_xdtm_tfidf) <- make.names(colnames(tothemoon_xdtm_tfidf))
+head(sort(colSums(tothemoon_xdtm_tfidf),decreasing = T), 10)
+
+'''
+            the       X.poolz__      X.bepronet     X.tothemoon X.mickalamasse1       X.exeedme           X.xed 
+      1431.1483       1372.3510       1371.8729       1271.3268       1191.9213       1089.8434        905.0192 
+     X.tacoswap             you             and 
+       867.8406        866.8797        857.8449 
+'''
+```
+
+### Wallstreetbets Tweets
+#### Remove & Clean
+
+```{r wsb, eval=FALSE}
+#Create a dictionary to stem words
+wsb_original_corpus <- tweet.corpus_wallstreetbets
+wsb_dtm <- DocumentTermMatrix(wsb_original_corpus)
+wsb_dict <- findFreqTerms(wsb_dtm, lowfreq = 0)
+wsb_dict_corpus <- VCorpus(VectorSource(wsb_dict))
+
+#Cleaning Process
+tweet.corpus_wallstreetbets <- text_cleaning(tweet.corpus_wallstreetbets)
+
+#Wallstreetbets Tweets TF-IDF
+wsb_dtm_tfidf <- DocumentTermMatrix(x=tweet.corpus_wallstreetbets,
+                                    control = list(weighting=function(x) weightTfIdf(x, normalize=FALSE)))
+wsb_xdtm_tfidf <- removeSparseTerms(wsb_dtm_tfidf,sparse = 0.95)
+wsb_xdtm_tfidf <- as.data.frame(as.matrix(wsb_xdtm_tfidf))
+colnames(wsb_xdtm_tfidf) <- stemCompletion(x = colnames(wsb_xdtm_tfidf),
+                                           dictionary = wsb_original_corpus,
+                                           type='prevalent')
+colnames(wsb_xdtm_tfidf) <- make.names(colnames(wsb_xdtm_tfidf))
+head(sort(colSums(wsb_xdtm_tfidf),decreasing = T), 10)
+
+'''
+wallstreetbets            gme              X              X              X              X            buy 
+     1271.4849      1106.7403      1071.6565       980.9971       968.9245       800.6552       794.4981 
+           via         stocks           last 
+      770.4224       702.9708       676.2242 
+'''
+```
+
+### Dave Portnoy Tweets
+#### Remove & Clean
+
+```{r dave, eval=FALSE}
+#Create a dictionary to stem words
+daveportnoy_original_corpus <- tweet.corpus_daveportnoy
+daveportnoy_dtm <- DocumentTermMatrix(daveportnoy_original_corpus)
+daveportnoy_dict <- findFreqTerms(daveportnoy_dtm, lowfreq = 0)
+daveportnoy_dict_corpus <- VCorpus(VectorSource(daveportnoy_dict))
+
+#Cleaning Process
+tweet.corpus_daveportnoy<- text_cleaning(tweet.corpus_daveportnoy)
+
+#Dave Portnoy Tweets TF-IDF
+daveportnoy_dtm_tfidf <- DocumentTermMatrix(x=tweet.corpus_daveportnoy,
+                                            control = list(weighting=function(x) weightTfIdf(x, normalize=FALSE)))
+daveportnoy_xdtm_tfidf <- removeSparseTerms(daveportnoy_dtm_tfidf,sparse = 0.95)
+daveportnoy_xdtm_tfidf <- as.data.frame(as.matrix(daveportnoy_xdtm_tfidf))
+colnames(daveportnoy_xdtm_tfidf) <- stemCompletion(x = colnames(daveportnoy_xdtm_tfidf),
+                                                   dictionary = daveportnoy_original_corpus,
+                                                   type='prevalent')
+colnames(daveportnoy_xdtm_tfidf) <- make.names(colnames(daveportnoy_xdtm_tfidf))
+head(sort(colSums(daveportnoy_xdtm_tfidf),decreasing = T), 10)
+
+'''
+   tough     penn 
+719.8594 553.5473 
+'''
+```
+
+## Predictive Model 
+### Predictive Model Example with the Elon Tweets Data
+
+```{r prediction, eval=FALSE}
+btc_data_elon_tfidf <- as.data.frame(cbind(price = btc_df[1] ,elon_xdtm_tfidf))
+
+#Split data
+set.seed(617)
+split <- sample(1:nrow(btc_data_elon_tfidf),size = 0.7*nrow(btc_data_elon_tfidf))
+train_elon_tfidf <-btc_data_elon_tfidf[split,]
+test_elon_tfidf  <- btc_data_elon_tfidf[-split,]
+
+#Decision Tree 
+tree_elon_tfidf <- rpart(x~.,train_elon_tfidf)
+
+#Measure the model performance (RMSE)
+sqrt(mean((predict(tree_elon_tfidf,newdata=test_elon_tfidf) - test_elon_tfidf$x)^2))
+
+'''
+RMSE = [1] 7172.324
+'''
+```
