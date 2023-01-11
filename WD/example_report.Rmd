@@ -1,0 +1,141 @@
+---
+output:
+  bookdown::pdf_document2:
+    fig_caption: yes
+    toc: false
+author: "Daniel Dasgupta  drd2141"
+title: "Location is Everything, Right?"
+abstract: |
+  Optional summary goes here.
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+fontfamily: mathpazo
+fontsize: 11pt
+# spacing: double
+---
+
+
+```{r setup, include=FALSE}
+## some setup options
+knitr::opts_chunk$set(cache=TRUE,
+                      message=FALSE, warning=FALSE,
+                      fig.path='figs/',
+                      cache.path = '_cache/',
+                      fig.process = function(x) {
+                      x2 = sub('-\\d+([.][a-z]+)$', '\\1', x)
+                      if (file.rename(x, x2)) x2 else x
+                      })
+```
+
+
+# Initial exploration
+During my initial exploration, I evaluated the differences between the two provided datasets to determine what needed to be done in my analysis.  The analysis dataset (which I named 'data'), has 39,527 observations with 91 variables. The scoring dataset, had 9,882 observations with 90 variables: the difference between the two datasets is the inclusion of price in the analysis dataset.
+
+I wanted to take a closer look at the contents of the dataset which variables had missing values or outliers.  First, I evaluated the variable types to determine if I needed to convert specific variables to character strings or factors to combine the datasets later on in my analysis. I used str() to have an overview of the data structures.  
+In the scoring dataset, I found that zipcode was stored as an integer but in the data, zipcode is a character.  I then converted the zipcode in the scoring dataset to a character to combine the two datasets.  
+
+I combinded the datasets to have an overview of which variables had missing values or N/A's.  To do this, I created 'missing_col_total' to examine which variables had missing data. Figure 1 shows the results of this analysis:
+
+Figure 1: Examining N/A values
+|     Variable                    | Number of N/A Values |
+|---------------------------------|-----------------------|
+| host_listings_count             | 16                    
+| cleaning_fee                    | 7978 
+| host_total_listings_count       | 16
+| zipcode                         | 103
+| beds                            | 57
+| square_feet                     | 48944
+| weekly_price                    | 45001
+| monthly_price                   | 49138
+| security_deposit                | 17156
+| reviews_per_month               | 2
+
+Although key variables like weekly_price and square_feet had over 45,000 N/A values, I was pleasently surprised to see that only 11 variables out of 90 (not including price) had N/A values.  
+
+After exploring the dataset to identify missing values, I crearted a correlation matrix of numeric variables to visualize which variables are correlated to price. In Figure 2, the correlation matrix shows that weekly_price, cleaning_fee, accommodates, beds, bedrooms and bathrooms are highly correlated to price.
+
+```{r}
+
+```
+
+
+```{r explore_1, eval=FALSE, echo=TRUE}
+## READ IN DATA HERE
+data = read.csv('analysisData.csv')
+scoring = read.csv('scoringData.csv')
+## INITIAL EXPLORATION STARTS HERE
+#Let's take a look at the variable types in both datasets
+str(data)
+str(scoring) #zipcode is an integer
+
+scoring$zipcode <- as.character(scoring$zipcode) #by converting zipcode into a character, I am now able to combine the datasets
+
+#I created a new dataframe, total, by binding the scoring and data datasets.
+
+total <- bind_rows(data, scoring)
+
+missing_col_total = colSums(is.na(total)); missing_col_total[missing_col_total > 0]
+# this 
+
+
+...
+## INITIAL EXPLORATION ENDS HERE
+```
+
+
+# Models and Feature Selection
+
+Write a paragraph about each model and feature selection you tried, why you used it, and what it told you.
+Make it clear when a feature selection technique you are describing is being used for one model and not another.
+Especially make sure to highlight which method you used for your final (i.e. best performing) submission.
+
+Write this section in your own words, since code will go into your code submission.
+In the R code you submit, be sure to mark what part of the code was used for initial exploration by using comments, for example:
+
+```{r tidying, eval=FALSE, echo=TRUE}
+
+## MODELING AND FEATURE SELECTION STARTS HERE
+## FEATURE SELECTION 1: SUBSET FORWARD SEARCH STARTS HERE
+…
+## FEATURE SELECTION 1: SUBSET FORWARD SEARCH ENDS HERE
+
+## MODEL 1: LINEAR REGRESSION WITH FEATURES FROM FEATURE SELECTION 1 STARTS HERE
+…
+## MODEL 1: LINEAR REGRESSION WITH FEATURES FROM FEATURE SELECTION 1 ENDS HERE
+
+## MODEL 2: DECISION TREE WITH FEATURES FROM FEATURE SELECTION 1 STARTS HERE
+…
+## MODEL 2: DECISION TREE WITH FEATURES FROM FEATURE SELECTION 1 ENDS HERE
+...
+
+## MODELING AND FEATURE SELECTION ENDS HERE
+```
+
+# Model Comparison
+
+State which combination of model and feature selection worked best, and what your Kaggle score was.
+It may help to make a table that describes what you know about each model,
+it is ok to leave blanks here if you don’t know something or it doesn't apply, for example:
+
+|     Model from previous section | RMSE on training data | RMSE for test data holdout or CV | RMSE on Kaggle | Other notes                        |
+|---------------------------------|-----------------------|----------------------------------|----------------|------------------------------------|
+| Model 1: Linear Regression      | 90.23879              | 92.9834                          | 89.37893       |                                    |
+| Model 2: Decision tree          | 86.9834               |                                  |  86.3498       | Used features selected for model 1 |
+|                                 |                       |                                  |                |                                    |
+| Model 3: CV-tuned Random forest | 62.9411               | 73.1331                          |  75.1234       | Final Kaggle RMSE: 78.1223         |
+
+
+# Discussion
+
+Describe and discuss the analysis that gave you the best results.
+Why do you think this was the top performing model for the 'cleaned-up' data?
+Can you use the model to make any inferences about the relationships between
+predictor variables and Airbnb prices?
+
+# Future directions
+
+What would you do for this project if you had more time?
+
+# Appendix
+
+This section is optional, but use it to describe alternative approaches that did
+not lead to your best model, but nevertheless seemed promising.
